@@ -30,27 +30,35 @@ running `npm install` of course)
 #### Get running
 To get the library, you can either download the dist directory from here or install with
 
-    npm install restfulclieint
+```
+npm install restfulclieint
+```
 
 If you installed with npm, you are set to import directly from node_modules.
 You can follow one of 2 import styles:
 
-    import {
-        getVersion, createReport, OutputFormat, XmlDataSource, AdoDataSource,
-        JsonDataSource, ODataDataSource, TemplateVariable, DataSet, Status, Version
-    } from 'restfulclient';
+```typescript
+import {
+    getVersion, createReport, OutputFormat, XmlDataSource, AdoDataSource,
+    JsonDataSource, ODataDataSource, TemplateVariable, DataSet, Status, Version
+} from 'restfulclient';
+```
 
 OR
 
-    import * as restfulclient from 'restfulclient';
+```typescript
+import * as restfulclient from 'restfulclient';
+```
 
 #### Reading files from file system
 When running reports, either the templates are already on the server in which case
 you just have to tell restfulclient where they are.  Otherwise you need to load up a
 file to send to the server.  If you need to load a file, here's how to do it:
 
-    import * as fs from 'fs';
-    var template = fs.readFileSync("path/to/template");
+```typescript
+import * as fs from 'fs';
+var template = fs.readFileSync("path/to/template");
+```
 
 This puts a [`Buffer`](https://nodejs.org/api/buffer.html) in template using Node's
 file system library.  You'll have to devise other means of getting a buffer if you are
@@ -62,44 +70,56 @@ Use the `createReport()` method which takes a template and an OutputFormat as we
 the address to your RESTful Engine server.  Other options can be specified optionally
 on the returned `Report` object.
 
-    var report = createReport("http://localhost:49731/", OutputFormat.PDF, template);
-    report.hyphenate = Hyphenation.Off;
+```typescript
+var report = createReport("http://localhost:49731/", OutputFormat.PDF, template);
+report.hyphenate = Hyphenation.Off;
+```
 
 #### Adding DataSources
 To add a DataSource, simply push it to the report's datasources array:
 
-    report.dataSources.push(
-        new AdoDataSource("MSSQL", "System.Data.SqlClient",
-            "Data Source=mssql.windward.net;Initial Catalog=Northwind;User=demo;Password=demo"
-        )
-    );
+```typescript
+report.dataSources.push(
+    new AdoDataSource("MSSQL", "System.Data.SqlClient",
+        "Data Source=mssql.windward.net;Initial Catalog=Northwind;User=demo;Password=demo"
+    )
+);
+```
 
 DataSets are done in the same way:
 
-    var dataset; // contains an rdlx file in a Buffer previously read by the file system
-    report.dataSets.push(new DataSet(dataset));
+```typescript
+var dataset; // contains an rdlx file in a Buffer previously read by the file system
+report.dataSets.push(new DataSet(dataset));
+```
 
 #### Adding a variable
 Adding a variable is just as easy -- you push variables onto DataSources rather
 than Templates though:
 
-    var dataSource = new AdoDataSource("MSSQL", "System.Data.SqlClient",
-        "Data Source=mssql.windward.net;Initial Catalog=Northwind;User=demo;Password=demo"
-    );
-    datasource.variables.push(new TemplateVariable("Var1", "hi there", "text"));
-    report.dataSources.push(datasource);
+```typescript
+var dataSource = new AdoDataSource("MSSQL", "System.Data.SqlClient",
+    "Data Source=mssql.windward.net;Initial Catalog=Northwind;User=demo;Password=demo"
+);
+datasource.variables.push(new TemplateVariable("Var1", "hi there", "text"));
+report.dataSources.push(datasource);
+```
 
 #### Running
 You want to run? Call `process()` which returns a `Promise`.  It only returns a
 Promise because of how the fetch API works (although it's a really good idea to
 use promises rather than blocking the main thread for a server call).
 
-    report.process();
+```typescript
+report.process();
+```
 
 You can optionally pass dataSources and dataSets to process() rather than adding
 them yourself.  These get pushed to report.
 
-    report.process(dataSources, dataSets);
+```typescript
+report.process(dataSources, dataSets);
+```
 
 #### Async
 The RESTful Engine provides an async API you can take advantage of if you want.
